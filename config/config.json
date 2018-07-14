@@ -1,0 +1,6 @@
+{
+  "mysql_host": "mysqlzf.databases.svc.cluster.local:3306",
+  "mysql_password": "123456",
+  "mysql_user": "youfu",
+  "mysql_db": "zfdb"
+}
