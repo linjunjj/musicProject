@@ -4,18 +4,16 @@ func init() {
 	RegistHandlerInterface(&Music{})
 
 }
-
-
 type Music struct {
 	Id string `json:"id" gorm:"column:ID;primary_key"`
 	Src string `json:"src" gorm:"column:SRC"`
 }
 func (*Music) TableName() string {
-	return "TBL_ACCOUNT_MASTER"
+	return "TBL_MUSIC"
 }
 
 func (*Music) MajorTopic() string {
-	return "merchant.account_master"
+	return "music"
 }
 
 func (*Music) Query(v interface{}, op Option) ([]interface{}, error) {
