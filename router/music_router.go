@@ -11,6 +11,8 @@ func init() {
 	gin_router.GetEngine().GET("/music", func(context *gin.Context) {
 		handler.HandlerQueryInterface(context, &MusicWithHeader{}, "post")
 	})
+
+
 	//删除音乐
 	gin_router.GetEngine().DELETE("/music/delete", func(context *gin.Context) {
 		handler.HandlerAddOrUpdateInterface(context, &handler.Music{}, "delete")

@@ -5,6 +5,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"musicProject/gin_router"
 	"musicProject/handler"
+	"net/http"
 )
 
 func init() {
@@ -23,6 +24,9 @@ func init() {
 	})
 	gin_router.GetEngine().POST("/relateMusic/search", func(context *gin.Context) {
 		handler.HandlerAddOrUpdateInterface(context, &handler.RelateMusic{}, "search")
+	})
+	gin_router.GetEngine().GET("/healthcheck", func(context *gin.Context) {
+		context.String(http.StatusOK, "ok")
 	})
 }
 
