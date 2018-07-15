@@ -41,3 +41,7 @@ func (*Music) Delete(v interface{}) error {
 func (*Music) Count(v interface{}) (int, error) {
 	return defaultHandler.Count(v)
 }
+
+func InsertMusic(v interface{}) error {
+	return defaultHandler.Insert(v)
+}

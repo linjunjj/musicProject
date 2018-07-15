@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -9,15 +10,15 @@ import (
 	"github.com/qiniu/api.v7/storage"
 	"github.com/sirupsen/logrus"
 	"net/http"
-	"strconv"
-	"time"
+	"os"
 )
 
 const (
-	AccessKey = "n83SaVzVtzNbZvGCz0gWsWPgpERKp0oK4BtvXS"
-	SecretKey = "1Uve9T2_gQX9pDY0BFJCa1RM_isy9rNjfC4XVliW"
-	Bucket    = "avatar-img-d"
-	Origin    = "http://ouibvkb9c.bkt.clouddn.com/"
+	AccessKey = "WNiSKaCk1gu5mt3JtW5cqwhtBMD0pCvitUhzKRwI"
+	SecretKey = "g9wBcCWARvYjEjyA8dHqsocB5qolKir-mqIvv-9l"
+	Bucket    = "sancheng"
+	Origin    = "http://os3kbkwao.bkt.clouddn.com/"
+	imgPath   = "/Users/linjun/go/src/shangcheng-api/gowork-api/image/"
 )
 
 type natsDataInterface interface {
@@ -271,8 +272,7 @@ func HandlerQueryInterface(ctx *gin.Context, natsInter natsDataInterface, method
 	ctx.JSON(200, resp)
 }
 
-func UploadImageInterface(ctx *gin.Context, natsInter natsDataInterface) {
-	majorTp := natsInter.MajorTopic()
+func UploadImageInterface(ctx *gin.Context) {
 	file, err := ctx.FormFile("file")
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -283,8 +283,8 @@ func UploadImageInterface(ctx *gin.Context, natsInter natsDataInterface) {
 		ctx.Abort()
 		return
 	}
-	fileName := strconv.FormatInt(time.Now().UTC().UnixNano(), 10) + ".png"
-	filePath := "./imgSrc" + fileName
+	filePath := imgPath + file.Filename
+	fileName := file.Filename
 	putPolicy := storage.PutPolicy{
 		Scope: Bucket,
 	}
@@ -300,5 +300,40 @@ func UploadImageInterface(ctx *gin.Context, natsInter natsDataInterface) {
 	// 构建表单上传的对象
 	formUploader := storage.NewFormUploader(&cfg)
 	ret := storage.PutRet{}
-
+	if err := ctx.SaveUploadedFile(file, filePath); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"status": 1,
+			"msg":    "文传上传失败",
+			"result": "",
+		})
+		ctx.Abort()
+		return
+	}
+	err1 := formUploader.PutFile(context.Background(), &ret, upToken, fileName, filePath, nil)
+	if err1 != nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"status": 1,
+			"msg":    "文件上传失败",
+			"result": "",
+		})
+		ctx.Abort()
+		return
+	}
+	data := &Music{Src: Origin + fileName}
+	err = InsertMusic(data)
+	if err != nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"status": 1,
+			"msg":    "文件上传成功，但插入数据库失败",
+			"result": "",
+		})
+		ctx.Abort()
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"status": 0,
+		"msg":    "suc",
+		"result": Origin + fileName,
+	})
+	os.Remove(filePath)
 }

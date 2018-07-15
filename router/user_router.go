@@ -10,7 +10,7 @@ import (
 func init() {
 	logrus.Info("router account_master init")
 	gin_router.GetEngine().GET("/user", func(context *gin.Context) {
-		handler.HandlerAddOrUpdateInterface(context, &UserWithHeader{}, "get")
+		handler.HandlerQueryInterface(context, &UserWithHeader{}, "get")
 	})
 	gin_router.GetEngine().DELETE("/user/delete", func(context *gin.Context) {
 		handler.HandlerAddOrUpdateInterface(context, &handler.User{}, "delete")

@@ -8,7 +8,7 @@ import (
 
 func init() {
 	gin_router.GetEngine().GET("/music", func(context *gin.Context) {
-		handler.HandlerAddOrUpdateInterface(context, &MusicWithHeader{}, "post")
+		handler.HandlerQueryInterface(context, &MusicWithHeader{}, "post")
 	})
 	gin_router.GetEngine().DELETE("/music/delete", func(context *gin.Context) {
 		handler.HandlerAddOrUpdateInterface(context, &handler.Music{}, "delete")
@@ -17,7 +17,7 @@ func init() {
 		handler.HandlerAddOrUpdateInterface(context, &handler.Music{}, "update")
 	})
 	gin_router.GetEngine().PUT("/music/add", func(context *gin.Context) {
-		handler.HandlerAddOrUpdateInterface(context, &handler.Music{}, "add")
+		handler.UploadImageInterface(context)
 	})
 	gin_router.GetEngine().POST("/music/search", func(context *gin.Context) {
 		handler.HandlerAddOrUpdateInterface(context, &handler.Music{}, "search")
