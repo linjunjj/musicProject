@@ -1,20 +1,22 @@
 package config
 
 import (
-	"io/ioutil"
+	"bytes"
 	"fmt"
 	"github.com/gin-gonic/gin/json"
-	"bytes"
+	"io/ioutil"
 	"os"
 	"strconv"
 )
 
-var envirnoment=map[string]string{
-	"tests":         "config/config.json",
+var envirnoment = map[string]string{
+	"tests": "config/config.json",
 }
-func SetConfig(config map[string]string){
-	envirnoment=config
+
+func SetConfig(config map[string]string) {
+	envirnoment = config
 }
+
 var bInited = false
 var settings map[string]interface{}
 var env = "tests"
@@ -22,7 +24,8 @@ var env = "tests"
 type ConfigValue struct {
 	Value interface{}
 }
-func Init()error{
+
+func Init() error {
 	if bInited {
 		return nil
 	}
@@ -94,20 +97,17 @@ func (self *ConfigValue) ToFloat() float64 {
 		return float64(f)
 	}
 
-
-
 	return 0
 }
 
-
-func LoadSettingByLocalEnv(env string,resultMap *map[string]interface{})error{
-	return LocalSettingsByFile(envirnoment[env],resultMap)
+func LoadSettingByLocalEnv(env string, resultMap *map[string]interface{}) error {
+	return LocalSettingsByFile(envirnoment[env], resultMap)
 }
 
-func LocalSettingsByFile(file string,resultMap *map[string]interface{})error{
-	content,err:=ioutil.ReadFile(file)
-	if err!=nil {
-		fmt.Println("Error",err)
+func LocalSettingsByFile(file string, resultMap *map[string]interface{}) error {
+	content, err := ioutil.ReadFile(file)
+	if err != nil {
+		fmt.Println("Error", err)
 		if err != nil {
 			panic(err)
 		}

@@ -1,15 +1,16 @@
 package handler
 
 import (
-	"strings"
 	"fmt"
 	"musicProject/db"
+	"strings"
 )
 
 func init() {
 	RegistHandlerInterface(&User{})
 
 }
+
 type StringArray []string
 
 type User struct {
@@ -17,18 +18,16 @@ type User struct {
 	JionData
 }
 
-
 type UserMaster struct {
-	Id string `json:"id" gorm:"column:ID;primary_key"`
+	Id       string `json:"id" gorm:"column:ID;primary_key"`
 	UserName string `json:"user_name" gorm:"column:USER_NAME"`
-	Age string `json:"age" gorm:"column:AGE"`
-	Account string `json:"account" gorm:"column:ACCOUNT"`
+	Age      string `json:"age" gorm:"column:AGE"`
+	Account  string `json:"account" gorm:"column:ACCOUNT"`
 	Password string `json:"password" gorm:"column:PASSWORD"`
 }
 type JionData struct {
-	LikeMusic               *StringArray `json:"like_music" gorm:"column:LIKE_SRC"`                               //交易订单号
+	LikeMusic *StringArray `json:"like_music" gorm:"column:LIKE_SRC"` //交易订单号
 }
-
 
 func (*UserMaster) TableName() string {
 	return "TBL_USER"
@@ -44,7 +43,7 @@ func (*User) Query(v interface{}, op Option) ([]interface{}, error) {
 		    left join TBL_MUSIC as m on m.id = rm.MUSIC_ID
             left join TBL_RELATEMUSIC as rm on rm.USER_ID = u.id`
 	structMap := map[string]interface{}{
-		"u":    &req.UserMaster,
+		"u": &req.UserMaster,
 	}
 	condition, values, err := defaultHandler.GetCondition(structMap, false)
 	if condition != "" {
@@ -79,4 +78,3 @@ func (*User) Delete(v interface{}) error {
 func (*User) Count(v interface{}) (int, error) {
 	return defaultHandler.Count(v)
 }
-

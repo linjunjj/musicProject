@@ -4,10 +4,12 @@ func init() {
 	RegistHandlerInterface(&Music{})
 
 }
+
 type Music struct {
-	Id string `json:"id" gorm:"column:ID;primary_key"`
+	Id  string `json:"id" gorm:"column:ID;primary_key"`
 	Src string `json:"src" gorm:"column:SRC"`
 }
+
 func (*Music) TableName() string {
 	return "TBL_MUSIC"
 }

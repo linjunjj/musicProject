@@ -2,8 +2,8 @@ package handler
 
 import (
 	"errors"
-	"reflect"
 	"fmt"
+	"reflect"
 	"strings"
 )
 
@@ -12,7 +12,6 @@ var (
 	successResponse      = BaseResponse{Status: "ok", Msg: "ok"}
 	errorMethodNotExist  = errors.New("method not exist !")
 )
-
 
 type HandlerInterface interface {
 	DBInterface
@@ -23,10 +22,10 @@ type HandlerInterface interface {
 type DBInterface interface {
 	Query(interface{}, Option) ([]interface{}, error)  //用于get或是post的精确字段查询，并且指定需要条数
 	Search(interface{}, Option) ([]interface{}, error) //用于模糊查询，并且指定需要条数
-	Update(interface{}) error                             //更新数据
-	Insert(interface{}) error                             //插入数据
-	Delete(interface{}) error                             //删除数据
-	Count(interface{}) (int, error)                       //返回当前条件的总条数
+	Update(interface{}) error                          //更新数据
+	Insert(interface{}) error                          //插入数据
+	Delete(interface{}) error                          //删除数据
+	Count(interface{}) (int, error)                    //返回当前条件的总条数
 }
 
 type InitInterface interface {
@@ -40,4 +39,3 @@ func RegistHandlerInterface(h HandlerInterface) {
 	}
 	handlerInterfacesMap[h.MajorTopic()] = h.(interface{})
 }
-

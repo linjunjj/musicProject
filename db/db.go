@@ -1,12 +1,12 @@
 package db
 
 import (
-	"git.coding.net/greatLIU/utils/db"
 	"fmt"
+	"git.coding.net/greatLIU/utils/db"
 	"musicProject/config"
 	"reflect"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 var tar *db.Conn
@@ -38,6 +38,7 @@ func Init_mysql() {
 func GetDBInstance() *db.Conn {
 	return tar
 }
+
 type StructField struct {
 	Struct    reflect.StructField
 	Value     reflect.Value
@@ -48,6 +49,7 @@ type StructField struct {
 	IsBlank   bool
 	Num       string
 }
+
 func isBlank(value reflect.Value) bool {
 	switch value.Kind() {
 	case reflect.String:
@@ -65,7 +67,6 @@ func isBlank(value reflect.Value) bool {
 	}
 	return reflect.DeepEqual(value.Interface(), reflect.Zero(value.Type()).Interface())
 }
-
 
 func ParseStruct(v interface{}) (map[string]StructField, error) {
 	structMap := make(map[string]StructField)

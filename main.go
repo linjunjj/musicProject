@@ -1,10 +1,10 @@
 package main
 
 import (
+	"github.com/gin-gonic/gin"
 	"musicProject/config"
 	"musicProject/db"
 	"musicProject/gin_router"
-	"github.com/gin-gonic/gin"
 	"net/http"
 )
 

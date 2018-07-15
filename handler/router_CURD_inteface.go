@@ -4,8 +4,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 	"github.com/jinzhu/gorm"
+	"github.com/qiniu/api.v7/auth/qbox"
+	"github.com/qiniu/api.v7/storage"
+	"github.com/sirupsen/logrus"
+	"net/http"
+	"strconv"
+	"time"
+)
+
+const (
+	AccessKey = "n83SaVzVtzNbZvGCz0gWsWPgpERKp0oK4BtvXS"
+	SecretKey = "1Uve9T2_gQX9pDY0BFJCa1RM_isy9rNjfC4XVliW"
+	Bucket    = "avatar-img-d"
+	Origin    = "http://ouibvkb9c.bkt.clouddn.com/"
 )
 
 type natsDataInterface interface {
@@ -109,19 +121,19 @@ func HandlerAddOrUpdateInterface(ctx *gin.Context, natsInter natsDataInterface, 
 		} else {
 			resp.Data = rets
 		}
-
+		replyData = resp
 	case "update", "UPDATE":
 		err = hd.Update(v)
 		if err != nil {
 			return
 		}
-		replyData =successResponse
+		replyData = successResponse
 	case "PUT", "put":
 		err = hd.Insert(v)
 		if err != nil {
 			return
 		}
-		replyData =successResponse
+		replyData = successResponse
 	case "count", "COUNT":
 		var count int
 		count, err = hd.Count(v)
@@ -173,7 +185,7 @@ func HandlerAddOrUpdateInterface(ctx *gin.Context, natsInter natsDataInterface, 
 		return
 	}
 	logrus.Infof("response: %+v\n", v)
-	ctx.JSON(200,replyData)
+	ctx.JSON(200, replyData)
 }
 
 /*
@@ -186,57 +198,107 @@ func HandlerAddOrUpdateInterface(ctx *gin.Context, natsInter natsDataInterface, 
     "msg": "错误信息"
 }
 */
-//func HandlerQueryInterface(ctx *gin.Context, natsInter natsDataInterface, method string) {
-//	majorTp := natsInter.MajorTopic()
-//	v := natsInter.(interface{})
-//	err := ctx.ShouldBindJSON(v)
-//	if err != nil {
-//		ctx.JSON(400, BaseResponse{Status: "fail", Msg: "参数格式有误"})
-//		return
-//	}
-//	logrus.Infof("request: %+v\n", v)
-//	res, err := Request(fmt.Sprintf("%s.%s", majorTp, method), v)
-//	if err != nil {
-//		ctx.JSON(400, BaseResponse{Status: "fail", Msg: err.Error()})
-//		return
-//	}
-//	var pageInfo Pagination
-//	err = json.Unmarshal(res, &pageInfo) //得到微服务返回的结果
-//	if err != nil {
-//		ctx.JSON(400, BaseResponse{Status: "fail", Msg: err.Error()})
-//		return
-//	}
-//	var resp APIResponse
-//	err = json.Unmarshal(res, &resp) //得到微服务返回的结果
-//	if err != nil {
-//		ctx.JSON(400, BaseResponse{Status: "fail", Msg: err.Error()})
-//		return
-//	}
-//	if method != "search" {
-//		//获取总数量
-//		res, err = Request(fmt.Sprintf("%s.count", majorTp), v)
-//		if err != nil {
-//			ctx.JSON(400, BaseResponse{Status: "fail", Msg: err.Error()})
-//			return
-//		}
-//
-//		total := &struct {
-//			Count int `json:"count"`
-//		}{
-//			Count: 0,
-//		}
-//
-//		err = json.Unmarshal(res, total)
-//		if err != nil {
-//			ctx.JSON(400, BaseResponse{Status: "fail", Msg: err.Error()})
-//			return
-//		}
-//		pageInfo.Total = total.Count
-//	} else {
-//		pageInfo.Total = len(resp.Data)
-//	}
-//
-//	resp.Pagination = pageInfo
-//	ctx.JSON(200, resp)
-//}
+func HandlerQueryInterface(ctx *gin.Context, natsInter natsDataInterface, method string) {
+	majorTp := natsInter.MajorTopic()
+	v := natsInter.(interface{})
+	err := ctx.ShouldBindJSON(v)
+	if err != nil {
+		ctx.JSON(400, BaseResponse{Status: "fail", Msg: "参数格式有误"})
+		return
+	}
+	logrus.Infof("request: %+v\n", v)
+	queryH := &QueryHeader{Size: 999}
+	v, ok := handlerInterfacesMap[majorTp]
+	hd, ok := v.(HandlerInterface)
+	if !ok {
+		err = fmt.Errorf("the handler %s is not exist !", majorTp)
+		return
+	}
 
+	var rets []interface{}
+	rets, err = hd.Query(v, Option{
+		Limit: queryH.Size,
+		Skip:  queryH.Page * queryH.Size,
+	})
+	resps := QueryResponse{
+		BaseResponse: BaseResponse{
+			Status: "ok",
+			Msg:    "ok",
+		},
+		QueryHeader: QueryHeader{
+			Page: queryH.Page,
+			Size: len(rets),
+		},
+	}
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			resps.Data = []interface{}{}
+		} else {
+			return
+		}
+	} else {
+		resps.Data = rets
+	}
+
+	if err != nil {
+		ctx.JSON(400, BaseResponse{Status: "fail", Msg: err.Error()})
+		return
+	}
+	var pageInfo Pagination
+
+	var resp APIResponse
+
+	if method != "search" {
+		//获取总数量
+		count, err := hd.Count(v)
+		if err != nil {
+			ctx.JSON(400, BaseResponse{Status: "fail", Msg: err.Error()})
+			return
+		}
+
+		total := &struct {
+			Count int `json:"count"`
+		}{
+			Count: 0,
+		}
+		total.Count = count
+		pageInfo.Total = total.Count
+	} else {
+		pageInfo.Total = len(resp.Data)
+	}
+
+	resp.Pagination = pageInfo
+	ctx.JSON(200, resp)
+}
+
+func UploadImageInterface(ctx *gin.Context, natsInter natsDataInterface) {
+	majorTp := natsInter.MajorTopic()
+	file, err := ctx.FormFile("file")
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"status": 1,
+			"msg":    "suc",
+			"result": "shibai",
+		})
+		ctx.Abort()
+		return
+	}
+	fileName := strconv.FormatInt(time.Now().UTC().UnixNano(), 10) + ".png"
+	filePath := "./imgSrc" + fileName
+	putPolicy := storage.PutPolicy{
+		Scope: Bucket,
+	}
+	mac := qbox.NewMac(AccessKey, SecretKey)
+	upToken := putPolicy.UploadToken(mac)
+	cfg := storage.Config{}
+	// 空间对应的机房
+	cfg.Zone = &storage.ZoneHuadong
+	// 是否使用https域名
+	cfg.UseHTTPS = false
+	// 上传是否使用CDN上传加速
+	cfg.UseCdnDomains = false
+	// 构建表单上传的对象
+	formUploader := storage.NewFormUploader(&cfg)
+	ret := storage.PutRet{}
+
+}

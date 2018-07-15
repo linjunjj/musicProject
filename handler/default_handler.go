@@ -1,15 +1,15 @@
 package handler
 
 import (
-	"strings"
-	"reflect"
+	"database/sql"
 	"fmt"
 	"musicProject/db"
-	"database/sql"
+	"reflect"
+	"strings"
 )
 
 var defaultHandler handler
-var _  DBInterface = defaultHandler
+var _ DBInterface = defaultHandler
 
 func DefaultHandler() DBInterface {
 	return defaultHandler

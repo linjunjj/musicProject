@@ -5,9 +5,9 @@ func init() {
 }
 
 type RelateMusic struct {
-	Id string `json:"id" gorm:"column:ID;primary_key"`
-    UserId  string `json:"user_id" gorm:"column:USER_ID" `
-    MusicId string `json:"music_id" gorm:"column:MUSIC_ID"`
+	Id      string `json:"id" gorm:"column:ID;primary_key"`
+	UserId  string `json:"user_id" gorm:"column:USER_ID" `
+	MusicId string `json:"music_id" gorm:"column:MUSIC_ID"`
 }
 
 func (*RelateMusic) TableName() string {

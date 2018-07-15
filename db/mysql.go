@@ -1,17 +1,17 @@
 package db
 
 import (
+	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
-	"time"
-	"strings"
-	"fmt"
 	"github.com/sirupsen/logrus"
+	"strings"
+	"time"
 )
 
 var mysqlDb *gorm.DB
 
-func NewMysqlDriver(dns string) *gorm.DB{
+func NewMysqlDriver(dns string) *gorm.DB {
 	condition := "timeout=60s&parseTime=True&charset=utf8mb4,utf8"
 	if strings.Contains(dns, "?") {
 		dns = dns + "&" + condition
@@ -27,7 +27,7 @@ func NewMysqlDriver(dns string) *gorm.DB{
 	db.DB().SetConnMaxLifetime(360 * time.Second)
 	return db
 }
-func InitMysql(dns string){
+func InitMysql(dns string) {
 	mysqlDb = NewMysqlDriver(dns)
 	mysqlDb.BlockGlobalUpdate(true) //禁止无condition进行更新或删除
 	mysqlDb.Callback().Update().Before("gorm:update").Register("valid_primary_key", ValidPrimaryKey)
@@ -48,6 +48,7 @@ func ValidPrimaryKey(scope *gorm.Scope) {
 func GetMysqlInstance() *gorm.DB {
 	return mysqlDb
 }
+
 type logger struct {
 }
 
