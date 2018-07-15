@@ -319,7 +319,7 @@ func UploadImageInterface(ctx *gin.Context) {
 		ctx.Abort()
 		return
 	}
-	data := &Music{Src: Origin + fileName}
+	data := &Music{Src: Origin + fileName,Name:fileName}
 	err = InsertMusic(data)
 	if err != nil {
 		ctx.JSON(http.StatusOK, gin.H{

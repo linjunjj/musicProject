@@ -8,6 +8,7 @@ func init() {
 type Music struct {
 	Id  string `json:"id" gorm:"column:ID;primary_key"`
 	Src string `json:"src" gorm:"column:SRC"`
+	Name string `json:"name" gorm:"column:NAME"`
 }
 
 func (*Music) TableName() string {

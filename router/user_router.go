@@ -25,7 +25,6 @@ func init() {
 		handler.HandlerAddOrUpdateInterface(context, &handler.User{}, "search")
 	})
 }
-
 type UserWithHeader struct {
 	handler.Pagination
 	handler.User
