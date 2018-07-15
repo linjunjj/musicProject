@@ -10,7 +10,7 @@ import (
 
 func init() {
 	logrus.Info("router relateMusic init")
-	gin_router.GetEngine().GET("/relateMusic", func(context *gin.Context) {
+	gin_router.GetEngine().POST("/relateMusic", func(context *gin.Context) {
 		handler.HandlerQueryInterface(context, &RelateMusicWithHeader{}, "get")
 	})
 	gin_router.GetEngine().PUT("/relateMusic/update", func(context *gin.Context) {

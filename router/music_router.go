@@ -8,7 +8,7 @@ import (
 
 func init() {
 	//获取全部音乐
-	gin_router.GetEngine().GET("/music", func(context *gin.Context) {
+	gin_router.GetEngine().POST("/music", func(context *gin.Context) {
 		handler.HandlerQueryInterface(context, &MusicWithHeader{}, "post")
 	})
 

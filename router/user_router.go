@@ -9,7 +9,7 @@ import (
 
 func init() {
 	logrus.Info("router account_master init")
-	gin_router.GetEngine().GET("/user", func(context *gin.Context) {
+	gin_router.GetEngine().POST("/user", func(context *gin.Context) {
 		handler.HandlerQueryInterface(context, &UserWithHeader{}, "get")
 	})
 	gin_router.GetEngine().DELETE("/user/delete", func(context *gin.Context) {
