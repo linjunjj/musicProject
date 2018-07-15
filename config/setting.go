@@ -10,7 +10,7 @@ import (
 )
 
 var envirnoment=map[string]string{
-	"tests":         "config/tests.json",
+	"tests":         "config/config.json",
 }
 func SetConfig(config map[string]string){
 	envirnoment=config
@@ -29,7 +29,7 @@ func Init()error{
 	env = os.Getenv("GO_ENV")
 	if env == "" {
 		fmt.Println("Warning: Setting preproduction environment due to lack of GO_ENV value")
-		env = "preproduction"
+		env = "tests"
 	}
 	fmt.Println("环境[" + env + "]")
 	var configMap map[string]interface{}

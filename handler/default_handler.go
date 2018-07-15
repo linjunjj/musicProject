@@ -1,10 +1,11 @@
-package interface_router
+package handler
 
 import (
 	"strings"
 	"reflect"
 	"fmt"
 	"musicProject/db"
+	"database/sql"
 )
 
 var defaultHandler handler
@@ -114,4 +115,57 @@ func (handler) querySQL(sql string, resultType interface{}) ([]interface{}, erro
 	}
 	return rets, nil
 
+}
+func (handler) ScanRows(rows *sql.Rows, v interface{}) ([]interface{}, error) {
+	typ := reflect.TypeOf(v).Elem()
+	var rets []interface{}
+	for rows.Next() {
+		rv := reflect.New(typ)
+		val := rv.Interface()
+		err := db.GetMysqlInstance().Debug().ScanRows(rows, val)
+		if err != nil {
+			return nil, err
+		}
+		rets = append(rets, val)
+	}
+	return rets, nil
+}
+
+func (handler) GetCondition(interMap map[string]interface{}, bSearch bool) (string, []interface{}, error) {
+	//var fdMap map[string]map[string]DB.StructField
+	condition := ""
+	var values []interface{}
+	for k, v := range interMap {
+		fdMap, err := db.ParseStruct(v)
+		if err != nil {
+			return condition, values, err
+		}
+		for tag, value := range fdMap {
+			if value.IsBlank {
+				continue
+			}
+			//用于获取string数组类的值
+			if value.Struct.Type.Kind() == reflect.Ptr && value.Struct.Type.Elem().Kind() == reflect.Slice {
+				vals := value.Value.Elem()
+				if vals.Len() < 1 {
+					continue
+				}
+				if bSearch {
+					condition += k + "." + tag + " like ? and "
+				} else {
+					condition += k + "." + tag + " = ? and "
+				}
+				values = append(values, vals.Index(0).String())
+				continue
+			}
+			if bSearch {
+				condition += k + "." + tag + " like ? and "
+			} else {
+				condition += k + "." + tag + " = ? and "
+			}
+			values = append(values, value.Value.Interface())
+		}
+	}
+	//fmt.Println(condition)
+	return condition, values, nil
 }

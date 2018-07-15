@@ -5,8 +5,8 @@ import (
 	"github.com/jinzhu/gorm"
 	"time"
 	"strings"
-	"github.com/Sirupsen/logrus"
 	"fmt"
+	"github.com/sirupsen/logrus"
 )
 
 var mysqlDb *gorm.DB

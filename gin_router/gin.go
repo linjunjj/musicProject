@@ -2,7 +2,7 @@ package gin_router
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 )
 
 var r *gin.Engine

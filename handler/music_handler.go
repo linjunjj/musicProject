@@ -1,9 +1,11 @@
-package interface_router
+package handler
 
 func init() {
 	RegistHandlerInterface(&Music{})
 
 }
+
+
 type Music struct {
 	Id string `json:"id" gorm:"column:ID;primary_key"`
 	Src string `json:"src" gorm:"column:SRC"`
