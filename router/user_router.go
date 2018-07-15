@@ -13,16 +13,16 @@ func init() {
 		 handler.HandlerAddOrUpdateInterface(context,&UserWithHeader{},"get")
 	 })
 	gin_router.GetEngine().DELETE("/user/delete", func(context *gin.Context) {
-		handler.HandlerAddOrUpdateInterface(context,&UserWithHeader{},"delete")
+		handler.HandlerAddOrUpdateInterface(context,&handler.User{},"delete")
 	})
 	gin_router.GetEngine().PUT("/user/update", func(context *gin.Context) {
-		handler.HandlerAddOrUpdateInterface(context,&UserWithHeader{}, "update")
+		handler.HandlerAddOrUpdateInterface(context,&handler.User{}, "update")
 	})
 	gin_router.GetEngine().PUT("/user/add", func(context *gin.Context) {
-		handler.HandlerAddOrUpdateInterface(context,&UserWithHeader{},"add")
+		handler.HandlerAddOrUpdateInterface(context,&handler.User{},"add")
 	})
 	gin_router.GetEngine().POST("/user/search", func(context *gin.Context) {
-		handler.HandlerAddOrUpdateInterface(context,&UserWithHeader{},"search")
+		handler.HandlerAddOrUpdateInterface(context,&handler.User{},"search")
 	})
 }
 
