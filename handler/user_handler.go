@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	RegistHandlerInterface(&UserMaster{})
+	RegistHandlerInterface(&User{})
 
 }
 type StringArray []string
