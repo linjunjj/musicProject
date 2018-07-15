@@ -15,8 +15,6 @@ func init() {
 	}
 	db.Init_mysql()
 }
-
-
 func main() {
 	gin_router.GetEngine().GET("/healthcheck", func(context *gin.Context) {
 		context.String(http.StatusOK, "ok")
